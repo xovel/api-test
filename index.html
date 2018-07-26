@@ -16,31 +16,47 @@
 <body>
 <div id="app">
   <div v-loading="loading" element-loading-text="加载中...">
-    <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+    <el-form ref="form" :model="form" :rules="rules" label-width="100px">
       <el-form-item label="调用类库" prop="lib">
         <el-radio-group v-model="form.lib">
           <el-radio label="jQuery"></el-radio>
           <el-radio label="axios"></el-radio>
           <el-radio label="fetch" v-if="supportFetch"></el-radio>
           <el-radio label="ajax">原生</el-radio>
-        </el-checkbox-group>
-      </el-form-item>
-      <el-form-item label="请求方式" prop="type">
-        <el-radio-group v-model="form.type">
-          <el-radio label="GET"></el-radio>
-          <el-radio label="POST"></el-radio>
-          <el-radio label="DELETE"></el-radio>
-          <el-radio label="PUT"></el-radio>
-          <el-radio label="HEAD"></el-radio>
-          <el-radio label="TRACE"></el-radio>
-          <el-radio label="CONNECT"></el-radio>
-        </el-checkbox-group>
+        </el-radio-group>
       </el-form-item>
       <el-form-item label="请求地址" prop="url">
-        <el-input v-model="form.url" placeholder="请输入要请求的链接地址" clearable></el-input>
+        <el-input v-model="form.url" placeholder="请输入要请求的链接地址" clearable>
+          <el-select v-model="form.type" slot="prepend">
+            <el-option label="GET" value="GET"></el-option>
+            <el-option label="POST" value="POST"></el-option>
+            <el-option label="DELETE" value="DELETE"></el-option>
+            <el-option label="PUT" value="PUT"></el-option>
+            <el-option label="HEAD" value="HEAD"></el-option>
+            <el-option label="TRACE" value="TRACE"></el-option>
+            <el-option label="CONNECT" value="CONNECT"></el-option>
+          </el-select>
+        </el-input>
       </el-form-item>
       <el-form-item label="headers" prop="headers">
-        <el-input type="textarea" v-model="form.headers" placeholder='请输入请求头参数，标准 JSON 字符串，如：{"token": "abc"}' clearable></el-input>
+        <div class="header-list">
+          <el-row :gutter="10" v-for="(item,index) in form.headers" :key="index">
+            <el-col :span="6">
+              <el-input v-model="item.name" clearable>
+                <template slot="prepend">名称</template>
+              </el-input>
+            </el-col>
+            <el-col :span="12">
+              <el-input v-model="item.value" clearable>
+                <template slot="prepend">值</template>
+              </el-input>
+            </el-col>
+            <el-col :span="3">
+              <el-button type="danger" icon="el-icon-delete" circle @click="removeHeader(index)"></el-button>
+            </el-col>
+          </el-row>
+        </div>
+        <el-button type="text" round icon="el-icon-plus" @click="addHeader">添加</el-button>
       </el-form-item>
       <el-form-item prop="params">
         <template slot="label">
@@ -71,7 +87,10 @@ new Vue({
         lib: 'jQuery',
         type: 'GET',
         url: '',
-        headers: '',
+        headers: [{
+          name: 'Content-Type',
+          value: 'application/json'
+        }],
         params: '',
         data: ''
       },
@@ -88,7 +107,7 @@ new Vue({
           { type: 'url', message: '请输入链接地址', trigger: 'change' }
         ]
       },
-      result: ''
+      result: '',
     }
   },
   created() {
@@ -104,7 +123,13 @@ new Vue({
           if (options.params) {
             options.url = this.joinUrl(options.url, options.params);
           }
-          options.headers = this.form.headers ? JSON.parse(this.form.headers) : {};
+          const headers = {};
+          this.form.headers.forEach(item => {
+            if (item.name && item.value) {
+              headers[item.name] = item.value;
+            }
+          })
+          options.headers = headers;
           options.data = this.form.data ? JSON.parse(this.form.data) : {};
 
           this.loading = true
@@ -194,9 +219,19 @@ new Vue({
         xhr.send(options.data);
       });
 
+    },
+    addHeader() {
+      this.form.headers.push({})
+    },
+    removeHeader(index) {
+      this.form.headers.splice(index, 1);
     }
   }
 })
 </script>
+<style>
+.el-select .el-input { width: 120px; } .input-with-select .el-input-group__prepend { background-color: #fff; }
+.header-list { padding: 0 20px; }
+</style>
 </body>
 </html>
