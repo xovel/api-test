@@ -42,21 +42,21 @@
         <div class="header-list">
           <el-row :gutter="10" v-for="(item,index) in form.headers" :key="index">
             <el-col :span="6">
-              <el-input v-model="item.name" clearable>
+              <el-input v-model="item.name" clearable size="mini">
                 <template slot="prepend">名称</template>
               </el-input>
             </el-col>
             <el-col :span="12">
-              <el-input v-model="item.value" clearable>
+              <el-input v-model="item.value" clearable size="mini">
                 <template slot="prepend">值</template>
               </el-input>
             </el-col>
             <el-col :span="3">
-              <el-button type="danger" icon="el-icon-delete" circle @click="removeHeader(index)"></el-button>
+              <el-button type="danger" size="mini" icon="el-icon-delete" circle @click="removeHeader(index)"></el-button>
             </el-col>
           </el-row>
         </div>
-        <el-button type="text" round icon="el-icon-plus" @click="addHeader">添加</el-button>
+        <el-button type="text" style="margin-left:30px;" icon="el-icon-plus" @click="addHeader">添加</el-button>
       </el-form-item>
       <el-form-item prop="params">
         <template slot="label">
